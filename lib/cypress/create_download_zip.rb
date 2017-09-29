@@ -63,6 +63,7 @@ module Cypress
     end
 
     def self.create_c1_criteria_zip(checklist_test, criteria_list)
+      return checklist_test.patient_archive if checklist_test['patient_archive']
       file = Tempfile.new("c1_sample_patients-#{Time.now.to_i}.zip")
       example_patients = {}
       checklist_test.measures.each do |m|
@@ -75,6 +76,8 @@ module Cypress
           add_file_to_zip(z, "sample patient for #{measure_id}.html", formatter.export(patient))
         end
       end
+      checklist_test.patient_archive = file
+      checklist_test.save
       file
     end
 
@@ -112,8 +115,8 @@ module Cypress
     def self.add_checklist_zips(z, checklist_tests, criteria_list)
       checklist_tests.each do |pt|
         p = pt.product
-        file = Cypress::CreateDownloadZip.create_c1_criteria_zip(p.product_tests.checklist_tests.first, criteria_list).read
-        add_file_to_zip(z, "checklisttest_#{p.name}_#{p.id}_c1_checklist_criteria.zip".tr(' ', '_'), file)
+        add_file_to_zip(z, "checklisttest_#{p.name}_#{p.id}_c1_checklist_criteria.zip".tr(' ', '_'),
+                        Cypress::CreateDownloadZip.create_c1_criteria_zip(p.product_tests.checklist_tests.first, criteria_list).read)
       end
     end
 
