@@ -1,6 +1,6 @@
 <%
 #
-# renders the errors for the most recent test execution for the given task.
+# renders the details and errors for the most recent test execution for the given task.
 #
 # must specify local variable "execution"
 #
@@ -55,46 +55,53 @@
     </ul>
   <% end %>
 
-  <% if collected_errors.files.values.any? { |err| err.count.positive? } %>
-    <h2><%= "Errors and " unless passing %>Warnings</h2>
-    <div id="xml-tabs" class="hidden file-error-tabs short-tabs">
-      <ul>
-        <% collected_errors.files.each do |file_name, error_result| %>
-          <li>
-            <a href=<%= "##{execution.id}_#{file_name.gsub(/[\W]/,'_')}" %>>
+  <h2>File Details<%= ": Warnings" if collected_errors.files.values.any? { |err| err.values.any? {|thing| thing[:execution_errors].present?} } %><%= "and Errors" unless passing%></h2>
+  <div id="xml-tabs" class="hidden file-error-tabs short-tabs">
+    <ul>
+      <% execution.artifact.file_names.each do |file_name| %>
+        <% error_result = collected_errors[:files][file_name] %>
+        <li>
+          <a href=<%= "##{execution.id}_#{file_name.gsub(/[\W]/,'_')}" %>>
+            <% if error_result%>
               <% total_errors = error_result.keys.map{ |s| error_result[s].execution_errors.count }.reduce(&:+) %>
-              <% if total_errors.positive? %>
-                <div class="file-name">
-                  <% if error_result.keys.any? { |s| s != 'Other Warnings' && s != 'CMS Warnings' && error_result[s].execution_errors.count.positive?} %>
-                    <i aria-hidden='true' class='fa fa-fw fa-times text-danger'></i>
-                  <% else %>
-                    <i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle text-warning'></i>
-                  <% end %>
-                  <%= file_name %>
-                </div>
-                <div class="file-badge">
-                  <span class="badge pull-right">
-                    <%= total_errors %>
-                    <span class="sr-only">errors</span>
-                  </span>
-                </div>
-              <% else %>
-                <div class="file-name">
-                  <i aria-hidden='true' class='fa fa-fw fa-check text-success'></i>
-                  <%= file_name %>
-                  <span class="sr-only">no errors</span>
-                </div>
-              <% end %>
-            </a>
-          </li>
-        <% end %>
-      </ul>
+            <% else %>
+              <% total_errors = 0 %>
+            <% end %>
+            <% if total_errors.positive? %>
+              <div class="file-name">
+                <% if error_result.keys.any? { |s| s != 'Other Warnings' && s != 'CMS Warnings' && error_result[s].execution_errors.count.positive?} %>
+                  <i aria-hidden='true' class='fa fa-fw fa-times text-danger'></i>
+                <% else %>
+                  <i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle text-warning'></i>
+                <% end %>
+                <%= file_name %>
+              </div>
+              <div class="file-badge">
+                <span class="badge pull-right">
+                  <%= total_errors %>
+                  <span class="sr-only">errors</span>
+                </span>
+              </div>
+            <% else %>
+              <div class="file-name">
+                <i aria-hidden='true' class='fa fa-fw fa-check text-success'></i>
+                <%= file_name %>
+                <span class="sr-only">no errors</span>
+              </div>
+            <% end %>
+          </a>
+        </li>
 
-      <% collected_errors.files.each do |file_name, error_result| %>
-        <div id=<%= "#{execution.id}_#{file_name.gsub(/[\W]/,'_')}" %>>
-          <%= render partial: 'test_executions/results/execution_results_for_file', locals: { execution: execution, file_name: file_name, error_result: error_result, is_passing: passing, on_execution_show_page: true } %>
-        </div>
+
       <% end %>
-    </div>
-  <% end %>
+    </ul>
+
+
+    <% execution.artifact.file_names.each do |file_name| %>
+      <% error_result = collected_errors[:files][file_name] %>
+      <div id=<%= "#{execution.id}_#{file_name.gsub(/[\W]/,'_')}" %>>
+        <%= render partial: 'test_executions/results/execution_results_for_file', locals: { execution: execution, file_name: file_name, error_result: error_result, is_passing: passing, on_execution_show_page: true } %>
+      </div>
+    <% end %>
+  </div>
 <% end %>

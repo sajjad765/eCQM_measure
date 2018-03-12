@@ -9,7 +9,7 @@ module Cypress
       execution.artifact.file_names.each do |this_name|
         all_errs = execution.execution_errors.by_file(this_name.force_encoding('UTF-8'))
         related_errs = execution.sibling_execution ? execution.sibling_execution.execution_errors.by_file(this_name) : [] # c3
-        next unless (all_errs.count + related_errs.count).positive?
+        # next unless (all_errs.count + related_errs.count).positive?
         doc = get_file(execution.artifact, this_name)
         collected_errors[:files][this_name] = create_file_error_hash(doc, all_errs, related_errs)
       end

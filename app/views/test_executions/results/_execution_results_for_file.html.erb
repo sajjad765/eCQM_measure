@@ -9,12 +9,10 @@
 #   on_execution_show_page (bool)            used to determine if a link to individual file results page should be displayed
 
 %>
-
-<% num_errors = error_result.keys.map { |s| error_result[s].execution_errors.count }.reduce(&:+) %>
-
-<% if num_errors.zero? %>
-  <p class = 'lead'><%= "#{file_name} - No problems found" %></p>
-  <% return %>
+<% if error_result%>
+  <% num_errors = error_result.keys.map { |s| error_result[s].execution_errors.count }.reduce(&:+) %>
+<% else %>
+  <% num_errors = 0 %>
 <% end %>
 
 <p class="lead">
@@ -29,6 +27,11 @@
 <% identifier = "#{execution.id}_#{file_name.gsub(/[\W]/,'_')}" %>
 <div class="xml-error-tabs">
   <ul>
+    <li>
+      <%= link_to "#breakdown" do %>
+        <span>Breakdown</span>
+      <% end %>
+    </li>
     <% error_result.each do |error_type, error_hash| %>
       <li>
         <%= link_to "##{error_type.tr(' ', '_')}_#{identifier}" do %>
@@ -37,6 +40,19 @@
       </li>
     <% end %>
   </ul>
+  <div id="#breakdown">
+    <% byebug %>
+    <% @patient_cache_all = QME::PatientCache.where({'value.patient_id'=> @files[i].record._id}) unless @files[i].record == nil %>
+    <% if @patient_cache_all && @patient_cache_all.first %>
+      <%= ActionView::Helpers::HighlightingHelper.render_measure_detail(@measures, @patient_cache_all) %>
+    <% else %>
+      <h3>Measure Breakdown Unavailable</h3>
+      File must validate and patient must fall into the IPP for <i>Measure Breakdown</i> view.
+      <br><br>
+    <% end %>
+    
+  </div>
+
   <% error_result.each do |error_type, error_hash| %>
     <div id=<%= "#{error_type.tr(' ', '_')}_#{identifier}" %>>
       <% if error_hash.execution_errors.count.positive? %>
@@ -68,4 +84,5 @@
       <% end %>
     </div>
   <% end %>
+
 </div>
