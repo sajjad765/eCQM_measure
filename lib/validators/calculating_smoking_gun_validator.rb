@@ -42,6 +42,7 @@ module Validators
       record = GoCDATools::Import::GoImporter.instance.parse_with_ffi(doc)
       record.test_id = te.id
       record.medical_record_number = rand(1_000_000_000_000_000)
+      record.file_name = options[:file_name]
       # When imported from go, negated enries need to lookup a related code
       Cypress::GoImport.replace_negated_codes(record, @bundle)
       record.save
@@ -70,7 +71,7 @@ module Validators
         options[:population_ids] = measure.population_ids
         passed = compare_results(original_results, results, options, passed)
       end
-      record.destroy
+      # record.destroy #make sure to destroy record when test id (task? or te?) object is destroyed
       passed
     end
 

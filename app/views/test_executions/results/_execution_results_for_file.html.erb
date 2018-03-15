@@ -41,8 +41,12 @@
     <% end %>
   </ul>
   <div id="#breakdown">
+    <% #limit to records associated with this execution, then use unique (to zip) filename to find record %>
+    <% record = Record.where({'test_id'=> execution._id, 'file_name'=> file_name}).first %>
+    <% #find all measures for the associated product_test %>
+    <% @measures = execution.task.product_test.measure_ids.collect { |id| Measure.where({'id' => id}).first }%>
     <% byebug %>
-    <% @patient_cache_all = QME::PatientCache.where({'value.patient_id'=> @files[i].record._id}) unless @files[i].record == nil %>
+    <% @patient_cache_all = QME::PatientCache.where({'value.patient_id'=> record._id}) unless record == nil %>
     <% if @patient_cache_all && @patient_cache_all.first %>
       <%= ActionView::Helpers::HighlightingHelper.render_measure_detail(@measures, @patient_cache_all) %>
     <% else %>
@@ -50,7 +54,7 @@
       File must validate and patient must fall into the IPP for <i>Measure Breakdown</i> view.
       <br><br>
     <% end %>
-    
+
   </div>
 
   <% error_result.each do |error_type, error_hash| %>

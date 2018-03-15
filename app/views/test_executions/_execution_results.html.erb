@@ -55,7 +55,7 @@
     </ul>
   <% end %>
 
-  <h2>File Details<%= ": Warnings" if collected_errors.files.values.any? { |err| err.values.any? {|thing| thing[:execution_errors].present?} } %><%= "and Errors" unless passing%></h2>
+  <h2>File Details<%= ": Warnings" if collected_errors.files.values.any? { |err| err.values.any? {|err_type| err_type[:execution_errors].present?} } %><%= " and Errors" unless passing%></h2>
   <div id="xml-tabs" class="hidden file-error-tabs short-tabs">
     <ul>
       <% execution.artifact.file_names.each do |file_name| %>
