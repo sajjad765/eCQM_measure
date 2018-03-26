@@ -60,6 +60,17 @@
         </tbody>
       </table>
     <% end %>
+
+    <h2>Measure Breakdown</h2>
+    <% @patient_cache_all = QME::PatientCache.where({'value.patient_id'=> @record._id})%>
+    <% if @patient_cache_all && @patient_cache_all.first %>
+      <%= ActionView::Helpers::HighlightingHelper.render_measure_detail(@measures, @patient_cache_all) %>
+    <% else %>
+      <h3>Measure Breakdown Unavailable</h3>
+      File must validate and patient must fall into the IPP for <i>Measure Breakdown</i> view.
+      <br><br>
+    <% end %>
+
   </div>
 <% end %>
 
