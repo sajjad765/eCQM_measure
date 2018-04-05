@@ -19,7 +19,7 @@ gem 'go-cda-tools', git: 'https://github.com/projectcypress/go-cda-tools.git', b
 gem 'quality-measure-engine',
     git: 'https://github.com/projectcypress/quality-measure-engine.git', branch: 'bump_mongoid'
 
-gem 'sharedcypress', :path => "/Users/Laurend/Projects/Cypress/sharedcypress"
+gem 'sharedcypress', git: 'https://github.com/projectcypress/sharedcypress.git', branch: 'master'
 
 # Use faker to generate addresses
 gem 'faker', '~> 1.5.0'

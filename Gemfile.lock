@@ -38,19 +38,21 @@ GIT
       zip-zip
 
 GIT
+  remote: https://github.com/projectcypress/sharedcypress.git
+  revision: 812cfe6d418e88b981daf3d5bf9cb1923679fe0f
+  branch: master
+  specs:
+    sharedcypress (0.1.0)
+      activesupport (~> 4.2.7)
+      sass
+
+GIT
   remote: https://github.com/turbolinks/turbolinks-classic
   revision: 80216ce9d89920bf073709405e3fce6d0a3ccd9a
   branch: master
   specs:
     turbolinks (3.0.0)
       coffee-rails
-
-PATH
-  remote: /Users/Laurend/Projects/Cypress/sharedcypress
-  specs:
-    sharedcypress (0.1.0)
-      activesupport (~> 4.2.7)
-      sass
 
 GEM
   remote: https://rubygems.org/
