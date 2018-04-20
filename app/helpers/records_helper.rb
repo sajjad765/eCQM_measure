@@ -22,7 +22,7 @@ module RecordsHelper
   end
 
   def full_name(record)
-    record.first + ' ' + record.last if record
+    record.givenNames.join(' ') + ' ' + record.familyName if record
   end
 
   def pop_sum(records, measure, population)

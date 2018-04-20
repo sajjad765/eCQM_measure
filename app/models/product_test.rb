@@ -16,7 +16,7 @@ class ProductTest
   belongs_to :product, :index => true, :touch => true
   has_many :tasks, :dependent => :destroy
 
-  has_many :records, :dependent => :destroy, :foreign_key => :test_id
+  #has_many :qdm_patients, :dependent => :destroy, :foreign_key => :test_id
 
   field :augmented_records, :type => Array, :default => []
 
@@ -54,12 +54,16 @@ class ProductTest
     super
   end
 
+  def records
+    QDM::Patient.where('extendedData.test_id' => self.id )
+  end
+
   # This is a helper method for the vendor and product cleanup code. It takes a collection of
   # product test ID's and deletes those ProducTests along with all associated data.
   def self.destroy_by_ids(product_test_ids)
     tasks = Task.where(:product_test_id.in => product_test_ids)
     task_ids = tasks.pluck(:_id)
-    records = Record.where(:test_id.in => product_test_ids)
+    records = QDM::Patient.where(:'extendedData.test_id'.in => product_test_ids)
     record_ids = records.pluck(:_id)
     test_executions = TestExecution.where(:task_id.in => task_ids)
     test_execution_ids = test_executions.pluck(:_id)
@@ -82,7 +86,7 @@ class ProductTest
       random_ids = if product.slim_test_deck?
                      []
                    else
-                     bundle.records.where(:test_id => nil).pluck('medical_record_number').uniq
+                     bundle.records.where('extendedData.test_id' => nil).pluck('extendedData.medical_record_number').uniq.map(&:medical_record_number)
                    end
       Cypress::PopulationCloneJob.new('test_id' => id, 'patient_ids' => master_patient_ids, 'randomization_ids' => random_ids,
                                       'randomize_demographics' => true, 'generate_provider' => product.c4_test, 'job_id' => job_id).perform
@@ -94,20 +98,19 @@ class ProductTest
   def archive_records
     file = Tempfile.new("product_test-#{id}.zip")
     recs = records.to_a
-
-    if product.duplicate_records && _type != 'FilteringTest'
-      prng = Random.new(rand_seed.to_i)
-      ids = results.where('value.IPP' => { '$gt' => 0 }).collect { |pc| pc.value.patient_id }
-      if ids.present?
-        recs = sample_and_duplicate_records(recs, ids, :random => prng)
-      end
-    end
+    #if product.duplicate_records && _type != 'FilteringTest'
+    #  prng = Random.new(rand_seed.to_i)
+    #  ids = results.where('value.IPP' => { '$gt' => 0 }).collect { |pc| pc.value.patient_id }
+    #  if ids.present?
+    #    recs = sample_and_duplicate_records(recs, ids, :random => prng)
+    #  end
+    #end
     Cypress::PatientZipper.zip(file, recs, :qrda)
     self.patient_archive = file
 
-    file = Tempfile.new("product_test-html-#{id}.zip")
-    Cypress::PatientZipper.zip(file, recs, :html)
-    self.html_archive = file
+    #file = Tempfile.new("product_test-html-#{id}.zip")
+    #Cypress::PatientZipper.zip(file, recs, :html)
+    #self.html_archive = file
     save
   end
 

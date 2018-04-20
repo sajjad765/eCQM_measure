@@ -24,7 +24,7 @@
               <% RecordsHelper::CV_POPULATION_KEYS.each do |population| %>
                 <td class="text-center">
                   <span class="sr-only">Measure <%= m.display_name %> population <%= population %> result: </span>
-                  <%= render 'calculation_result_icon', :result => get_result_value(@results, m, population), :episode_of_care => m.episode_of_care %>
+                  <!--%= render 'calculation_result_icon', :result => get_result_value(@results, m, population), :episode_of_care => m.episode_of_care %-->
                 </td>
               <% end %>
             </tr>
@@ -32,7 +32,6 @@
         </tbody>
       </table>
     <% end %>
-
     <% if @measures.where(continuous_variable: false).length.positive? %>
       <table class="table table-condensed">
         <thead>
@@ -52,7 +51,7 @@
               <% RecordsHelper::PROPORTION_POPULATION_KEYS.each do |population| %>
                 <td class="text-center">
                   <span class="sr-only">Measure <%= m.display_name %> population <%= population %> result: </span>
-                  <%= render 'calculation_result_icon', :result => get_result_value(@results, m, population), :episode_of_care => m.episode_of_care %>
+                  <!--%= render 'calculation_result_icon', :result => get_result_value(@results, m, population), :episode_of_care => m.episode_of_care %-->
                 </td>
               <% end %>
             </tr>
@@ -62,14 +61,13 @@
     <% end %>
   </div>
 <% end %>
-
   <div class="col-md-6">
     <h2>Patient Details</h2>
     <dl class="dl-horizontal">
-      <dt>DOB</dt><dd><%= display_time(@record['birthdate']) %></dd>
-      <dt>Gender</dt><dd><%= full_gender_name(@record['gender']) %></dd>
-      <dt>Race</dt><dd><%= @record['race']['name'] %></dd>
-      <dt>Ethnicity</dt><dd><%= @record['ethnicity']['name'] %></dd>
+      <dt>DOB</dt><dd><%= @record.birthDatetime %></dd>
+      <dt>Gender</dt><dd><%= full_gender_name('M') %></dd>
+      <dt>Race</dt><dd><%= @record['race'] %></dd>
+      <dt>Ethnicity</dt><dd><%= @record['ethnicity'] %></dd>
     </dl>
     <% RecordsHelper::SECTIONS.each do |s| %>
       <div class="panel panel-default patient-details">

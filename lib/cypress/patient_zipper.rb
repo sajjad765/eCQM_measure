@@ -32,13 +32,15 @@ module Cypress
       @measures = measures.to_a
       @start_time = start_time
       @end_time = end_time
+      @hds_record_converter = CQM::Converter::QDMPatient.new
     end
 
     def export(patient)
-      cms_compatibility = patient.product_test && patient.product_test.product.c3_test
-      case patient.bundle.qrda_version
+      product_test = ProductTest.find(patient.extendedData.test_id)
+      cms_compatibility = product_test && product_test.product.c3_test
+      case product_test.bundle.qrda_version
       when 'r5'
-        C5EXPORTER.export(patient, measures, start_time, end_time, nil, 'r5', cms_compatibility)
+        C5EXPORTER.export(@hds_record_converter.to_hds(patient), measures, start_time, end_time, nil, 'r5', cms_compatibility)
       end
     end
   end
@@ -75,9 +77,9 @@ module Cypress
 
     def self.apply_sort_to(patients)
       if patients.is_a? Array
-        patients.sort_by { |p| p.first + '_' + p.last }
+        patients.sort_by { |p| p.givenNames.join(' ') + '_' + p.familyName }
       else
-        patients.order_by(:first.asc, :last.asc)
+        patients.order_by(:givenNames.asc, :familyName.asc)
       end
     end
 
@@ -100,7 +102,7 @@ module Cypress
     def self.mes_start_end(patients)
       return unless patients.first
       first = patients.first
-      ptest = first.product_test
+      ptest = ProductTest.find(patients.first.extendedData.test_id)
       measures = ptest ? ptest.measures.top_level : patients.first.bundle.measures.top_level
       start_date = ptest ? ptest.start_date : Time.at(patients.first.bundle.effective_date).in_time_zone
       end_date = ptest ? ptest.end_date : start_date + 1.year
@@ -108,8 +110,8 @@ module Cypress
     end
 
     def self.next_entry_path(patient, index)
-      safe_first_name = patient.first.delete("'")
-      safe_last_name = patient.last.delete("'")
+      safe_first_name = patient.givenNames.join(' ').delete("'")
+      safe_last_name = patient.familyName.delete("'")
       "#{index}_#{safe_first_name}_#{safe_last_name}"
     end
   end

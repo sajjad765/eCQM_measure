@@ -8,6 +8,10 @@ class Bundle
 
   scope :available, -> { where(:deprecated.ne => true) }
 
+  def records
+    QDM::Patient.where(bundle_id: self._id, test_id: nil).order_by([["last", :asc]])
+  end
+
   def results
     HealthDataStandards::CQM::PatientCache.where(:bundle_id => id, 'value.test_id' => nil)
                                           .order_by(['value.last', :asc])
