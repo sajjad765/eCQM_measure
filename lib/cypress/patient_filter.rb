@@ -1,5 +1,5 @@
 module Cypress
-  class RecordFilter
+  class PatientFilter
     def self.filter(records, filters, options)
       #TODO R2P: filter using new model, replace with patients
       records.where create_query(filters, options)

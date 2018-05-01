@@ -16,6 +16,7 @@ class ProductTest
   belongs_to :product, :index => true, :touch => true
   has_many :tasks, :dependent => :destroy
 
+  #TODO R2P: fix foreign key descriptor?
   has_many :patients, :dependent => :destroy, :foreign_key => :test_id
 
   field :augmented_patients, :type => Array, :default => []
@@ -83,9 +84,9 @@ class ProductTest
       random_ids = if product.slim_test_deck?
                      []
                    else
-                     # TODO R2P: check correlationId name and ...where(:'extendedData.correlationId' => nil).pluck('extendedData.medical_record_number').uniq doesn't work
+                     # TODO R2P: check where(:'extendedData.correlation_id' => nil).pluck('extendedData.medical_record_number').uniq doesn't work
                      #get medical record numbers for master patients (have no correlation (test) id)
-                     bundle.patients.where(:'extendedData.correlationId' => nil).map {|mp| mp[:extendedData][:medical_record_number] }.uniq
+                     bundle.patients.where(:'extendedData.correlation_id' => nil).map {|mp| mp[:extendedData][:medical_record_number] }.uniq
                    end
       Cypress::PopulationCloneJob.new('test_id' => id, 'patient_ids' => master_patient_ids, 'randomization_ids' => random_ids,
                                       'randomize_demographics' => true, 'generate_provider' => product.c4_test, 'job_id' => job_id).perform
@@ -137,15 +138,13 @@ class ProductTest
   end
 
   def randomize_clinical_data(pat_arr, dups, random)
-    #TODO R2P: change to use patient model
     # Pick a patient to clinically randomize, then delete it from dups (so it doesn't get duplicated also)
     # And delete it from pat_arr so we don't return the whole patient too
     return [pat_arr, dups] if dups.count < 2
     clinical_pat = dups.sample(:random => random)
     dups.delete(clinical_pat)
     pat_arr.delete(clinical_pat)
-    # TODO R2P: change clinical randomizer to use data entries in new model
-    # [pat_arr.concat(Cypress::ClinicalRandomizer.randomize(clinical_pat, effective_date, measure_period_start, :random => random)), dups]
+    [pat_arr.concat(Cypress::ClinicalRandomizer.randomize(clinical_pat, effective_date, measure_period_start, :random => random)), dups]
   end
 
   def calculate

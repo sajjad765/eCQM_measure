@@ -25,6 +25,7 @@ class ProductsController < ApplicationController
   end
 
   def new
+    byebug
     @product = Product.new(vendor: @vendor)
     setup_new
   end

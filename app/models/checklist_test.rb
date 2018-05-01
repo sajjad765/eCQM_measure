@@ -116,7 +116,7 @@ class ChecklistTest < ProductTest
     end
   end
 
-  def archive_records
+  def archive_patients
     if patient_archive.path.nil?
       self.patient_archive = Cypress::CreateDownloadZip.create_c1_patient_zip(self)
       save
