@@ -17,7 +17,7 @@ class ProductTest
   has_many :tasks, :dependent => :destroy
 
   #TODO R2P: fix foreign key descriptor?
-  has_many :patients, :dependent => :destroy, :foreign_key => :test_id
+  has_many :patients, :dependent => :destroy, :foreign_key => :test_id, :class_name => 'QDM::Patient'
 
   field :augmented_patients, :type => Array, :default => []
 
@@ -236,7 +236,7 @@ class ProductTest
   def master_patient_ids
     mpl_ids = patients_in_ipp_and_greater
 
-    if product.randomize_records
+    if product.randomize_patients
       denom_ids = pick_denom_ids
 
       msrpopl_ids = pick_msrpopl_ids
