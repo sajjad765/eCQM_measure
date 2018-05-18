@@ -7,9 +7,9 @@ module Cypress
     def self.randomize(patient, prng, allow_dups = false)
       #TODO R2P: change to patient name and model throughout file
       randomize_name(patient, prng, allow_dups)
-      # randomize_race(patient, prng) TODO R2P: priority 1.3
-      # randomize_ethnicity(patient, prng)
-      # randomize_address(patient)
+      randomize_race(patient, prng)
+      randomize_ethnicity(patient, prng)
+      randomize_address(patient)
       randomize_insurance_provider(patient)
     end
 
@@ -31,35 +31,33 @@ module Cypress
     end
 
     def self.randomize_race(patient, prng)
-      #TODO R2P: check assignment
       race_element = patient.get_data_elements('patient_characteristic','race').first
       race_hash = APP_CONSTANTS['randomization']['races'].sample(random: prng)
-      race_element.dataElementCodes.first = {}
-      race_element.dataElementCodes.first.code = race_hash[:code]
-      race_element.dataElementCodes.first.codeSystem = race_hash[:code_system]
-      race_element.dataElementCodes.first.descriptor = race_hash[:display_name]
+      race_element.dataElementCodes[0] = {}
+      race_element.dataElementCodes[0]['code'] = race_hash['code']
+      race_element.dataElementCodes[0]['codeSystem'] = race_hash['codeSystem']
+      race_element.dataElementCodes[0]['descriptor'] = race_hash['name']
     end
 
     def self.randomize_ethnicity(patient, prng)
-      #TODO R2P: check assignment
       ethnicity_element = patient.get_data_elements('patient_characteristic','ethnicity').first
       ethnicity_hash = APP_CONSTANTS['randomization']['ethnicities'].sample(random: prng)
-      ethnicity_element.dataElementCodes.first = {}
-      ethnicity_element.dataElementCodes.first.code = ethnicity_hash[:code]
-      ethnicity_element.dataElementCodes.first.codeSystem = ethnicity_hash[:code_system]
-
+      ethnicity_element.dataElementCodes[0] = {}
+      ethnicity_element.dataElementCodes[0]['code'] = ethnicity_hash['code']
+      ethnicity_element.dataElementCodes[0]['codeSystem'] = ethnicity_hash['codeSystem']
+      ethnicity_element.dataElementCodes[0]['descriptor'] = ethnicity_hash['name']
     end
 
     def self.randomize_address(patient)
       #TODO R2P: hash into extendedData okay? (not in Master Patient object)
       address = {}
-      address.use = 'HP'
-      address.street = ["#{Faker::Address.street_address} #{Faker::Address.street_suffix}"]
-      address.city = Faker::Address.city
-      address.state = Faker::Address.state_abbr
-      address.zip = Faker::Address.zip(address.state)
-      address.country = 'US'
-      patient.extendedData.addresses = [address]
+      address['use'] = 'HP'
+      address['street'] = ["#{Faker::Address.street_address} #{Faker::Address.street_suffix}"]
+      address['city'] = Faker::Address.city
+      address['state'] = Faker::Address.state_abbr
+      address['zip'] = Faker::Address.zip(address.state)
+      address['country'] = 'US'
+      patient.extendedData['addresses'] = [address]
     end
 
     def self.randomize_insurance_provider(patient)
