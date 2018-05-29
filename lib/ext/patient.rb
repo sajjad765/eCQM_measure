@@ -222,20 +222,20 @@ module QDM
     #   Record::Sections.each {|section| self.dedup_section!(section)}
     # end
     #
-    def shift_dates(date_diff)
-      self.birthDatetime = (self.birthDatetime.nil?) ? nil : self.birthDatetime + date_diff
-      #TODO R2P: are provider_performances still being used?
-      #TODO R2P: priority 1.2 (time shift should be implemented in model)
-      # self.provider_performances.each {|pp| pp.shift_dates(date_diff)}
-      #shift all dataElements
-      self.dataElements.each do |de|
-        de.expiredDatetime = (de.expiredDatetime.nil?) ? nil : de.expiredDatetime + date_diff if de.qdmStatus == 'patientCharacteristicExpired'
-        de.authorDatetime =  (de.authorDatetime.nil?) ? nil : de.authorDatetime + date_diff
-        de.prevalencePeriod.shift_dates(date_diff) if de.prevalencePeriod
-        de.relevantPeriod.shift_dates(date_diff) if de.relevantPeriod
-      end
-
-    end
+    # def shift_dates(date_diff)
+    #   self.birthDatetime = (self.birthDatetime.nil?) ? nil : self.birthDatetime + date_diff
+    #   #TODO R2P: are provider_performances still being used?
+    #   #TODO R2P: priority 1.2 (time shift should be implemented in model) ...shift any extended data???
+    #   # self.provider_performances.each {|pp| pp.shift_dates(date_diff)}
+    #   #shift all dataElements
+    #   self.dataElements.each do |de|
+    #     de.expiredDatetime = (de.expiredDatetime.nil?) ? nil : de.expiredDatetime + date_diff if de.qdmStatus == 'patientCharacteristicExpired'
+    #     de.authorDatetime =  (de.authorDatetime.nil?) ? nil : de.authorDatetime + date_diff
+    #     de.prevalencePeriod.shift_dates(date_diff) if de.prevalencePeriod
+    #     de.relevantPeriod.shift_dates(date_diff) if de.relevantPeriod
+    #   end
+    #
+    # end
     #
     # private
     #

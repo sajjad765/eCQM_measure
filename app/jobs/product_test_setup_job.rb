@@ -9,7 +9,8 @@ class ProductTestSetupJob < ApplicationJob
     # product_test.pick_filter_criteria if product_test.is_a? FilteringTest #TODO R2P: priority 4
     calc_job = Cypress::JsEcqmCalc.new(product_test.patients.map { |rec| rec._id.to_s },
                                        product_test.measures.map { |mes| mes._id.to_s },
-                                       { 'correlation_id': product_test._id.to_s } )
+                                       { 'correlation_id': product_test._id.to_s,
+                                         'effective_date': Time.at(product_test.effective_date).in_time_zone.to_formatted_s(:number) } )
     calc_job.sync_job
     # TODO support calculation for a filtered test deck
     # if product_test.respond_to? :patient_cache_filter
