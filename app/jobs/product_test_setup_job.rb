@@ -6,7 +6,8 @@ class ProductTestSetupJob < ApplicationJob
     product_test.generate_provider if product_test.is_a? MeasureTest
     #TODO R2P: records to patients name
     product_test.generate_patients(@job_id) if product_test.patients.count.zero?
-    # product_test.pick_filter_criteria if product_test.is_a? FilteringTest #TODO R2P: priority 4
+    product_test.pick_filter_criteria if product_test.is_a? FilteringTest
+    #TODO R2P: filter before sending to engine
     calc_job = Cypress::JsEcqmCalc.new(product_test.patients.map { |rec| rec._id.to_s },
                                        product_test.measures.map { |mes| mes._id.to_s },
                                        { 'correlation_id': product_test._id.to_s,

@@ -38,17 +38,18 @@ module QDM
     end
 
     # R2P TODO: where to get provider_performances from
-    # def lookup_provider(include_address = nil)
-    #   provider = Provider.find(provider_performances.first['provider_id'])
-    #   addresses = []
-    #   provider.addresses.each do |address|
-    #     addresses << { 'street' => address.street, 'city' => address.city, 'state' => address.state, 'zip' => address.zip,
-    #                    'country' => address.country }
-    #   end
-    #
-    #   return { 'npis' => [provider.npi], 'tins' => [provider.tin], 'addresses' => addresses } if include_address
-    #   { 'npis' => [provider.npi], 'tins' => [provider.tin] }
-    # end
+    def lookup_provider(include_address = nil)
+      #find with provider id hash i.e. "$oid"->value
+      provider = Provider.find(JSON.parse(extendedData.provider_performances).first['provider_id'])
+      addresses = []
+      provider.addresses.each do |address|
+        addresses << { 'street' => address.street, 'city' => address.city, 'state' => address.state, 'zip' => address.zip,
+                       'country' => address.country }
+      end
+
+      return { 'npis' => [provider.npi], 'tins' => [provider.tin], 'addresses' => addresses } if include_address
+      { 'npis' => [provider.npi], 'tins' => [provider.tin] }
+    end
 
     def duplicate_randomization(random: Random.new)
       patient = clone
