@@ -3,16 +3,16 @@ module Cypress
     #TODO R2P: pick filter criteria using new model
     def self.races(patient, _options = {})
       race_element = patient.get_data_elements('patient_characteristic','race').first
-      race_element.dataElementCodes.first.code
+      [race_element.dataElementCodes.first.code]
     end
 
     def self.ethnicities(patient, _options = {})
       ethnicity_element = patient.get_data_elements('patient_characteristic','ethnicity').first
-      ethnicity_element.dataElementCodes.first.code
+      [ethnicity_element.dataElementCodes.first.code]
     end
 
     def self.genders(patient, _options = {})
-      patient.gender
+      [patient.gender]
     end
 
     def self.payers(patient, _options = {})
@@ -41,18 +41,18 @@ module Cypress
     end
 
     def self.problems(_record, options = {})
-      problem_oid = lookup_problem(options[:measures], options[:patients])
+      problem_oid = lookup_problem(options[:measures], options[:patients], options[:prng])
       { oid: [problem_oid], hqmf_ids: hqmf_oids_for_problem(problem_oid, options[:measures]) }
     end
 
-    def self.lookup_problem(measures, records)
+    def self.lookup_problem(measures, records, prng)
       measure = measures.first
       code_list_id = fallback_id = ''
       # determine which data criteira are diagnoses, and make sure we choose one that one of our records has
       # if we can't find one that matches a record, just use any diagnosis (fallback)
 
       #randomize before iterating
-      measure.hqmf_document.source_data_criteria.shuffle.each do |_criteria, cr_hash|
+      measure.hqmf_document.source_data_criteria.to_a.shuffle(random: prng).each do |_criteria, cr_hash|
         #find diagnosis criteria in measure
         next unless cr_hash.definition.eql? 'diagnosis'
         fallback_id = cr_hash['code_list_id']
@@ -68,7 +68,6 @@ module Cypress
     end
 
     def self.find_problem_in_records(records, value_set)
-      byebug
       #go through all record diagnoses
       records.each do |r|
         #TODO: check condition sufficient?

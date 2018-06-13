@@ -40,7 +40,7 @@ module QDM
     # R2P TODO: where to get provider_performances from
     def lookup_provider(include_address = nil)
       #find with provider id hash i.e. "$oid"->value
-      provider = Provider.find(JSON.parse(extendedData.provider_performances).first['provider_id'])
+      provider = Provider.find(JSON.parse(extendedData['provider_performances']).first['provider_id'])
       addresses = []
       provider.addresses.each do |address|
         addresses << { 'street' => address.street, 'city' => address.city, 'state' => address.state, 'zip' => address.zip,
