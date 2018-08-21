@@ -11,14 +11,14 @@ module QDM
     end
 
     def product_test
-      ProductTest.where('_id' => extendedData['correlation_id']).most_recent
+      ProductTest.where('_id' => extendedData[:correlation_id]).most_recent
     end
 
     def bundle
       if !self['bundleId'].nil?
-        HealthDataStandards::CQM::Bundle.find(self['bundleId'])
-      elsif !extendedData['correlation_id'].nil?
-        ProductTest.find(extendedData['correlation_id']).bundle
+        Bundle.find(self['bundleId'])
+      elsif !extendedData[:correlation_id].nil?
+        ProductTest.find(extendedData[:correlation_id]).bundle
       end
     end
 
@@ -28,7 +28,9 @@ module QDM
     end
 
     def original_patient
-      Patient.find(extendedData[:original_patient]) if extendedData[:original_patient]
+      if self['original_medical_record_number']
+        bundle.patients.where('extendedData.medical_record_number' => self['original_medical_record_number']).first
+      end
     end
 
     def lookup_provider(include_address = nil)
@@ -52,8 +54,8 @@ module QDM
     end
 
     def provider
-      return nil unless extendedData['provider_performances']
-      Provider.find(JSON.parse(extendedData['provider_performances']).first['provider_id'])
+      return nil unless extendedData.provider_performances
+      Provider.find(JSON.parse(extendedData.provider_performances).first['provider_id']['$oid'])
     end
 
     #
@@ -73,15 +75,13 @@ module QDM
         patient = Cypress::NameRandomizer.randomize_patient_name_last(patient, :random => random)
         changed[:last] = [familyName, patient.familyName]
       when 2 # birthdate
-        while birthDatetime == patient.birthDatetime
-          patient.birthDatetime = patient.birthDatetime.change(
-            case random.rand(3)
-            when 0 then { :day => 1, :month => 1 }
-            when 1 then { :day => random.rand(28) + 1 }
-            when 2 then { :month => random.rand(12) + 1 }
-            end
-          )
-        end
+        patient.birthDatetime = DateTime.strptime(patient.birthDatetime.to_s, '%s').change(
+          case random.rand(3)
+          when 0 then { :day => 1, :month => 1 }
+          when 1 then { :day => random.rand(28) + 1 }
+          when 2 then { :month => random.rand(12) + 1 }
+          end
+        ).strftime('%s').to_i
         changed[:birthdate] = [birthDatetime, patient.birthDatetime]
       end
       [patient, changed]
