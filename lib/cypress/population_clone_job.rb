@@ -104,8 +104,7 @@ module Cypress
       cloned_patient.dataElements.each do |entry|
         entry_id_hash[entry._id.to_s] = BSON::ObjectId.new
         entry._id = entry_id_hash[entry._id.to_s]
-        new_entry_id = QDM::Id.new(value: entry._id)
-        entry.id = new_entry_id
+        entry.id = QDM::Id.new(value: entry._id)
         entries_with_references.push(index) unless entry['relatedTo'].nil?
         index += 1
       end
@@ -115,15 +114,7 @@ module Cypress
     def reconnect_references(cloned_patient, entries_with_references, entry_id_hash)
       entries_with_references.each do |entry_with_reference_index|
         entry_with_reference = cloned_patient.dataElements[entry_with_reference_index]
-        references_to_add = []
-        entry_with_reference.relatedTo.each do |ref|
-          new_ref = QDM::Id.new(value: entry_id_hash[ref.value].to_s)
-          references_to_add << new_ref
-        end
-        entry_with_reference.relatedTo.destroy
-        references_to_add.each do |ref|
-          entry_with_reference.relatedTo << ref
-        end
+        entry_with_reference.relatedTo.map! { |ref| entry_id_hash[ref.to_s] }.compact!
       end
     end
 
