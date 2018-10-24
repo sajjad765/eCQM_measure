@@ -15,6 +15,8 @@
                          elsif (controller.controller_name == 'records' && (params[:bundle_id] || params[:task_id].nil?)) ||
                                (current_page?(:records) && params[:task_id].nil?)
                            :master_patient_list
+                         elsif current_page?(src_path)
+                           :submission
                          elsif current_page?(admin_path)
                            :admin
                          else
@@ -42,6 +44,12 @@
               <% end %>
           </li>
           <% end %>
+          <li <% if curr_page == :submission %>class="active"<% end %>>
+            <%= link_to src_path, class: 'navbar-item'   do %>
+            <%= icon('fas fa-fw', 'clipboard-list', :"aria-hidden" => true) %>
+            Submission Readiness Check
+            <% end %>
+          </li>
           <li <% if curr_page == :account %>class="active"<% end %>>
             <%= link_to edit_user_registration_path, class: 'navbar-item'   do %>
             <%= icon('fas fa-fw', 'user', :"aria-hidden" => true) %>

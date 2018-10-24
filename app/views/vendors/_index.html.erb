@@ -1,0 +1,58 @@
+<div>
+<% if !@vendors || @vendors.empty? %>
+  <p class="lead">
+    Start EHR Certification with
+    <%= button_to new_vendor_path, :method => :get, :class => "btn btn-primary btn-lg" do %>
+      <%= icon('fas fa-fw', 'plus', :"aria-hidden" => true) %> Add Vendor
+    <% end %>
+  </p>
+<% else %>
+  <%= button_to new_vendor_path, :method => :get, :class => "btn btn-primary pull-right" do %>
+    <%= icon('fas fa-fw', 'plus', :"aria-hidden" => true) %> Add Vendor
+  <% end %>
+
+  <% @favorites = @vendors.select{ |v| v.favorite_user_ids.include? current_user.id} %>
+  <% unless @favorites.empty? %>
+    <h1>Favorite Vendors</h1>
+    <table class="table vendor-table-favorite">
+      <thead>
+        <tr>
+          <th scope="col"><span class="sr-only">Actions</span></th>
+          <th scope="col">Vendor</th>
+          <th scope="col">Products</th>
+          <th scope="col"><%= icon('fas fa-fw text-success', 'check', :"aria-hidden" => true) %>Passing</th>
+          <th scope="col"><%= icon('fas fa-fw text-danger', 'times', :"aria-hidden" => true) %>Failing</th>
+          <th scope="col"><%= icon('fas fa-fw text-warning', 'exclamation', :"aria-hidden" => true) %>Errored</th>
+          <th scope="col"><%= icon('far fa-fw text-info', 'circle', :"aria-hidden" => true) %>Incomplete</th>
+          <th scope="col"><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= render partial: 'vendor', collection: @favorites %>
+      </tbody>
+    </table>
+  <% end %>
+
+  <% @non_favorites = @vendors.select{ |v| !v.favorite_user_ids.include? current_user.id} %>
+  <% unless @non_favorites.empty? %>
+    <h1>Vendors</h1>
+    <table class="table vendor-table">
+      <thead>
+        <tr>
+          <th scope="col"><span class="sr-only">Actions</span></th>
+          <th scope="col">Vendor</th>
+          <th scope="col">Products</th>
+          <th scope="col"><%= icon('fas fa-fw text-success', 'check', :"aria-hidden" => true) %>Passing</th>
+          <th scope="col"><%= icon('fas fa-fw text-danger', 'times', :"aria-hidden" => true) %>Failing</th>
+          <th scope="col"><%= icon('fas fa-fw text-warning', 'exclamation', :"aria-hidden" => true) %>Errored</th>
+          <th scope="col"><%= icon('far fa-fw text-info', 'circle', :"aria-hidden" => true) %>Incomplete</th>
+          <th scope="col"><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= render partial: 'vendors/vendor', collection: @non_favorites %>
+      </tbody>
+    </table>
+  <% end %>
+<% end %>
+</div>

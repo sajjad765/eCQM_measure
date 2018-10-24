@@ -84,6 +84,17 @@ Rails.application.routes.draw do
     end
   end
 
+  resource :src, :only => [:show], :controller => 'submission_readiness'
+
+  namespace 'src' do
+    resources :vendors, :only => %i[show edit update] # do
+    # member do
+    #   post :set_default
+    #   post :deprecate
+    # end
+    # end
+  end
+
   resource :admin, :only => [:show], :controller => 'admin'
 
   namespace 'admin' do
